@@ -4,8 +4,16 @@
 	"name": "signal-server-new",
 	"migrations": [
 		{
-			"new_sqlite_classes": ["Chat"],
+			"new_sqlite_classes": [
+				"Chat"
+			],
 			"tag": "v1"
+		}
+	],
+	"kv_namespaces": [
+		{
+			"binding": "LOG_KV",
+			"id": "3bc828cce60c44b494be5698b8804c12"
 		}
 	],
 	"assets": {

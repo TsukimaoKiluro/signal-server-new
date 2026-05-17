@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { usePartySocket } from "partysocket/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
 	BrowserRouter,
 	Routes,
@@ -12,6 +12,66 @@ import { nanoid } from "nanoid";
 
 import { names, type ChatMessage, type Message } from "../shared";
 
+// ---------- 新增日志组件 ----------
+function LogsView() {
+	const [logs, setLogs] = useState<any[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	const fetchLogs = async () => {
+		try {
+			const res = await fetch('/api/logs?limit=100');
+			const data = await res.json();
+			setLogs(data.logs || []);
+		} catch (err) {
+			console.error('Failed to fetch logs:', err);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchLogs();
+		const interval = setInterval(fetchLogs, 3000);
+		return () => clearInterval(interval);
+	}, []);
+
+	if (loading) return <div>Loading logs...</div>;
+
+	return (
+		<div style={{ padding: '20px', fontFamily: 'monospace' }}>
+			<h2>信令服务器日志</h2>
+			<table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
+				<thead>
+				<tr>
+					<th>时间</th>
+					<th>级别</th>
+					<th>事件</th>
+					<th>房间ID</th>
+					<th>客户端ID</th>
+					<th>详情</th>
+				</tr>
+				</thead>
+				<tbody>
+				{logs.map((log, idx) => (
+					<tr key={idx}>
+						<td>{new Date(log.timestamp).toLocaleString()}</td>
+						<td style={{ color: log.level === 'error' ? 'red' : 'green' }}>{log.level}</td>
+						<td>{log.event}</td>
+						<td>{log.roomId}</td>
+						<td>{log.clientId?.slice(-8)}</td>
+						<td>
+							{log.event === 'message' && `→ ${log.targetId?.slice(-8)} (${log.type})`}
+							{log.event === 'close' && `code ${log.code}`}
+							{log.event === 'error' && log.error}
+						</td>
+					</tr>
+				))}
+				</tbody>
+			</table>
+		</div>
+	);
+}
+// ---------- 原有 App 组件 ----------
 function App() {
 	const [name] = useState(names[Math.floor(Math.random() * names.length)]);
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -25,7 +85,6 @@ function App() {
 			if (message.type === "add") {
 				const foundIndex = messages.findIndex((m) => m.id === message.id);
 				if (foundIndex === -1) {
-					// probably someone else who added a message
 					setMessages((messages) => [
 						...messages,
 						{
@@ -36,9 +95,6 @@ function App() {
 						},
 					]);
 				} else {
-					// this usually means we ourselves added a message
-					// and it was broadcasted back
-					// so let's replace the message with the new message
 					setMessages((messages) => {
 						return messages
 							.slice(0, foundIndex)
@@ -56,11 +112,11 @@ function App() {
 					messages.map((m) =>
 						m.id === message.id
 							? {
-									id: message.id,
-									content: message.content,
-									user: message.user,
-									role: message.role,
-								}
+								id: message.id,
+								content: message.content,
+								user: message.user,
+								role: message.role,
+							}
 							: m,
 					),
 				);
@@ -92,15 +148,12 @@ function App() {
 						role: "user",
 					};
 					setMessages((messages) => [...messages, chatMessage]);
-					// we could broadcast the message here
-
 					socket.send(
 						JSON.stringify({
 							type: "add",
 							...chatMessage,
 						} satisfies Message),
 					);
-
 					content.value = "";
 				}}
 			>
@@ -119,13 +172,20 @@ function App() {
 	);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+// ---------- 渲染 ----------
 createRoot(document.getElementById("root")!).render(
 	<BrowserRouter>
-		<Routes>
-			<Route path="/" element={<Navigate to={`/${nanoid()}`} />} />
-			<Route path="/:room" element={<App />} />
-			<Route path="*" element={<Navigate to="/" />} />
-		</Routes>
+		<div>
+			<nav style={{ padding: '10px', background: '#f0f0f0' }}>
+				<a href="/" style={{ marginRight: '10px' }}>聊天室</a>
+				<a href="/logs">日志查看</a>
+			</nav>
+			<Routes>
+				<Route path="/" element={<Navigate to={`/${nanoid()}`} />} />
+				<Route path="/:room" element={<App />} />
+				<Route path="/logs" element={<LogsView />} />
+				<Route path="*" element={<Navigate to="/" />} />
+			</Routes>
+		</div>
 	</BrowserRouter>,
 );

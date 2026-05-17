@@ -1,48 +1,37 @@
 <!doctype html>
-<html lang="en">
-	<head>
-		<!-- Basic Page Needs
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-		<meta charset="utf-8" />
-		<title>Chat!</title>
-		<meta name="description" content="" />
-		<meta name="author" content="" />
+<html lang="zh-CN">
+<head>
+	<meta charset="utf-8" />
+	<title>信令服务器 · 聊天与日志</title>
+	<meta name="description" content="基于 Cloudflare Durable Objects 的聊天室 + 信令日志" />
+	<meta name="author" content="" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-		<!-- Mobile Specific Metas
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<!-- CSS 框架（原项目已使用）-->
+	<link rel="stylesheet" href="css/normalize.css" />
+	<link rel="stylesheet" href="css/skeleton.css" />
+	<link rel="stylesheet" href="styles.css" />
 
-		<!-- FONT
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-
-		<!-- CSS
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-		<link rel="stylesheet" href="css/normalize.css" />
-		<link rel="stylesheet" href="css/skeleton.css" />
-		<link rel="stylesheet" href="styles.css" />
-
-		<!-- Favicon
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-		<link rel="icon" type="image/ico" href="favicon.ico" />
-		<script src="/dist/index.js" type="module"></script>
-	</head>
-	<body>
-		<!-- Primary Page Layout
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-		<div class="container" style="width: 95%; height: 100%">
-			<div class="row" style="height: 100%">
-				<div class="one-third column" style="margin-top: 25%">
-					<h4><b>Chat</b>, powered by Durable Objects</h4>
-					<p>
-						This chat room is hosted in a single Durable Object, running in one
-						process in one machine in one location, very close to the users.
-					</p>
-				</div>
-				<div class="two-thirds column" id="root"></div>
-			</div>
+	<link rel="icon" type="image/ico" href="favicon.ico" />
+	<!-- React 打包后的入口脚本 -->
+	<script src="/dist/index.js" type="module"></script>
+</head>
+<body>
+<div class="container" style="width: 95%; height: 100%">
+	<div class="row" style="height: 100%">
+		<!-- 侧边说明栏（可保留，不影响 React 渲染）-->
+		<div class="one-third column" style="margin-top: 25%">
+			<h4><b>信令服务器 + 聊天室</b></h4>
+			<p>
+				基于 Cloudflare Durable Objects 构建。<br />
+				• 聊天功能使用 PartySocket 实时通信<br />
+				• 信令服务器记录 WebSocket 连接日志<br />
+				• 访问 <code>/logs</code> 可查看实时信令活动
+			</p>
 		</div>
-
-		<!-- End Document
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-	</body>
+		<!-- React 应用挂载点 -->
+		<div class="two-thirds column" id="root"></div>
+	</div>
+</div>
+</body>
 </html>

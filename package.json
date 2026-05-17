@@ -16,9 +16,10 @@
 		"nanoid": "5.1.6",
 		"partyserver": "0.0.75",
 		"partysocket": "1.1.6",
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0",
-		"react-router": "7.9.6"
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-router": "7.9.6",
+		"react-router-dom": "^7.15.1"
 	},
 	"devDependencies": {
 		"@types/react": "^18.0.0",
@@ -32,6 +33,10 @@
 		"cf-typegen": "wrangler types ./src/server/worker-configuration.d.ts",
 		"check": "tsc --project src/client && tsc --project src/server && wrangler deploy --dry-run",
 		"deploy": "wrangler deploy",
-		"dev": "wrangler dev"
+		"dev": "wrangler dev",
+		"build": "esbuild src/client/index.tsx --bundle --splitting --format=esm --platform=browser --outdir=public/dist"
+	},
+	"optionalDependencies": {
+		"@cloudflare/workerd-windows-64": "^1.20260517.1"
 	}
 }
